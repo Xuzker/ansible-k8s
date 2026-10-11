@@ -1,0 +1,13 @@
+---
+- name: Disable swap immediately
+  ansible.builtin.command:
+    cmd: swapoff -a
+  when: common_disable_swap | bool
+  changed_when: false
+
+- name: Disable swap entries in /etc/fstab
+  ansible.builtin.replace:
+    path: /etc/fstab
+    regexp: '^(\s*[^#]\S+\s+\S+\s+swap\s+\S+\s+\S*\s*)$'
+    replace: '# \1'
+  when: common_disable_swap | bool

@@ -1,0 +1,42 @@
+---
+- name: Check Kubernetes control plane initialization
+  ansible.builtin.stat:
+    path: /etc/kubernetes/admin.conf
+  register: k8s_control_plane_initialized
+
+- name: Initialize Kubernetes control plane
+  ansible.builtin.command:
+    cmd: >
+      kubeadm init
+      --pod-network-cidr={{ k8s_pod_network_cidr }}
+      --service-cidr={{ k8s_service_cidr }}
+      --control-plane-endpoint={{ k8s_control_plane_endpoint }}
+  when: not k8s_control_plane_initialized.stat.exists
+  register: k8s_kubeadm_init
+
+- name: Create kubeconfig directory for Kubernetes user
+  ansible.builtin.file:
+    path: "{{ kubernetes_user_home }}/.kube"
+    state: directory
+    owner: "{{ kubernetes_user }}"
+    group: "{{ kubernetes_group }}"
+    mode: '0700'
+
+- name: Install kubeconfig for Kubernetes user
+  ansible.builtin.copy:
+    src: /etc/kubernetes/admin.conf
+    dest: "{{ kubernetes_user_home }}/.kube/config"
+    remote_src: true
+    owner: "{{ kubernetes_user }}"
+    group: "{{ kubernetes_group }}"
+    mode: '0600'
+
+- name: Install Flannel CNI
+  ansible.builtin.command:
+    cmd: >
+      kubectl apply
+      -f
+      {{ k8s_cni_manifest_url }}
+  environment:
+    KUBECONFIG: /etc/kubernetes/admin.conf
+  changed_when: true

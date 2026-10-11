@@ -1,0 +1,37 @@
+---
+- name: Create APT keyrings directory
+  ansible.builtin.file:
+    path: /etc/apt/keyrings
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+
+- name: Download Kubernetes repository signing key
+  ansible.builtin.get_url:
+    url: "https://pkgs.k8s.io/core:/stable:/v{{ k8s_version }}/deb/Release.key"
+    dest: /tmp/kubernetes-release.key
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Convert Kubernetes repository signing key
+  ansible.builtin.command:
+    cmd: >
+      gpg
+      --dearmor
+      --yes
+      --output {{ k8s_apt_keyring }}
+      /tmp/kubernetes-release.key
+  args:
+    creates: "{{ k8s_apt_keyring }}"
+
+- name: Configure Kubernetes APT repository
+  ansible.builtin.apt_repository:
+    repo: "{{ k8s_apt_repository }}"
+    filename: kubernetes
+    state: present
+
+- name: Update APT cache after Kubernetes repository configuration
+  ansible.builtin.apt:
+    update_cache: true

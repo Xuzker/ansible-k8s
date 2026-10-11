@@ -1,0 +1,22 @@
+---
+- name: Include Kubernetes repository configuration
+  ansible.builtin.import_tasks:
+    file: repository.yml
+
+- name: Include Kubernetes package installation
+  ansible.builtin.import_tasks:
+    file: packages.yml
+
+- name: Include containerd configuration
+  ansible.builtin.import_tasks:
+    file: containerd.yml
+
+- name: Include Kubernetes control plane configuration
+  ansible.builtin.import_tasks:
+    file: master.yml
+  when: inventory_hostname in groups['master']
+
+- name: Include Kubernetes worker configuration
+  ansible.builtin.import_tasks:
+    file: worker.yml
+  when: inventory_hostname in groups['workers']

@@ -1,0 +1,95 @@
+---
+ansible_user: user
+ansible_become_password: "{{ vault_ansible_password }}"
+ansible_password: "{{ vault_ansible_password }}"
+
+# ============================================================================
+# Operating system
+# ============================================================================
+
+os_packages:
+  - curl
+  - ca-certificates
+  - gnupg
+  - apt-transport-https
+  - software-properties-common
+
+
+# ============================================================================
+# Kubernetes system user
+# ============================================================================
+
+kubernetes_user: kubernetes
+kubernetes_group: kubernetes
+
+kubernetes_user_home: "/home/{{ kubernetes_user }}"
+
+
+# ============================================================================
+# Kubernetes
+# ============================================================================
+
+kubernetes_version: "1.34"
+
+kubernetes_apt_repository: >-
+  deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg]
+  https://pkgs.k8s.io/core:/stable:/v{{ kubernetes_version }}/deb/
+  /
+
+kubernetes_packages:
+  - kubelet
+  - kubeadm
+  - kubectl
+
+
+# ============================================================================
+# Kubernetes cluster
+# ============================================================================
+
+kubernetes_pod_network_cidr: "10.244.0.0/16"
+
+kubernetes_service_cidr: "10.96.0.0/12"
+
+kubernetes_control_plane_endpoint: "{{ hostvars[groups['master'][0]]['ansible_host'] }}:6443"
+
+
+# ============================================================================
+# Container runtime
+# ============================================================================
+
+containerd_package: containerd
+
+containerd_config_path: /etc/containerd/config.toml
+
+containerd_service: containerd
+
+containerd_state_directory: /var/lib/containerd
+
+containerd_socket: unix:///run/containerd/containerd.sock
+
+
+# ============================================================================
+# CNI
+# ============================================================================
+
+kubernetes_cni_manifest_url: >-
+  https://raw.githubusercontent.com/flannel-io/flannel/master/Documentation/kube-flannel.yml
+
+
+# ============================================================================
+# Kernel
+# ============================================================================
+
+kubernetes_kernel_modules:
+  - overlay
+  - br_netfilter
+
+
+# ============================================================================
+# Sysctl
+# ============================================================================
+
+kubernetes_sysctl_parameters:
+  net.bridge.bridge-nf-call-iptables: 1
+  net.bridge.bridge-nf-call-ip6tables: 1
+  net.ipv4.ip_forward: 1

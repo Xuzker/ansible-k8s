@@ -1,0 +1,24 @@
+---
+common_packages:
+  - curl
+  - ca-certificates
+  - gnupg
+  - apt-transport-https
+  - software-properties-common
+
+common_system_user: kubernetes
+
+common_system_group: kubernetes
+
+common_disable_swap: true
+
+common_enable_ip_forwarding: true
+
+common_kernel_modules:
+  - overlay
+  - br_netfilter
+
+common_sysctl_parameters:
+  net.bridge.bridge-nf-call-iptables: 1
+  net.bridge.bridge-nf-call-ip6tables: 1
+  net.ipv4.ip_forward: 1

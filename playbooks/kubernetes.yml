@@ -1,0 +1,17 @@
+---
+- name: Prepare Kubernetes hosts
+  hosts: k8s
+  become: true
+  gather_facts: true
+
+  roles:
+    - role: common
+
+
+- name: Deploy Kubernetes
+  hosts: k8s
+  become: true
+  gather_facts: true
+
+  roles:
+    - role: k8s

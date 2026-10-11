@@ -1,0 +1,17 @@
+---
+- name: Install Kubernetes packages
+  ansible.builtin.apt:
+    name: "{{ k8s_packages }}"
+    state: present
+
+- name: Hold Kubernetes packages
+  ansible.builtin.dpkg_selections:
+    name: "{{ item }}"
+    selection: hold
+  loop: "{{ k8s_packages }}"
+
+- name: Enable kubelet service
+  ansible.builtin.systemd:
+    name: kubelet
+    enabled: true
+    state: started

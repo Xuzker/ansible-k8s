@@ -1,0 +1,20 @@
+---
+- name: Include package installation tasks
+  ansible.builtin.import_tasks:
+    file: packages.yml
+
+- name: Include system user tasks
+  ansible.builtin.import_tasks:
+    file: users.yml
+
+- name: Include swap configuration tasks
+  ansible.builtin.import_tasks:
+    file: swap.yml
+
+- name: Include kernel configuration tasks
+  ansible.builtin.import_tasks:
+    file: kernel.yml
+
+- name: Include sysctl configuration tasks
+  ansible.builtin.import_tasks:
+    file: sysctl.yml

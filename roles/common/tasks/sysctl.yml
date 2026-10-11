@@ -1,0 +1,13 @@
+---
+- name: Configure Kubernetes sysctl parameters
+  ansible.builtin.copy:
+    dest: /etc/sysctl.d/99-kubernetes.conf
+    owner: root
+    group: root
+    mode: '0644'
+    content: |
+      {% for parameter, value in common_sysctl_parameters.items() %}
+      {{ parameter }} = {{ value }}
+      {% endfor %}
+  notify:
+    - Apply sysctl configuration

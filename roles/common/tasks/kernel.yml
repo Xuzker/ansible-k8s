@@ -1,0 +1,17 @@
+---
+- name: Load required Kubernetes kernel modules
+  ansible.builtin.modprobe:
+    name: "{{ item }}"
+    state: present
+  loop: "{{ common_kernel_modules }}"
+
+- name: Configure Kubernetes kernel modules
+  ansible.builtin.copy:
+    dest: /etc/modules-load.d/kubernetes.conf
+    owner: root
+    group: root
+    mode: '0644'
+    content: |
+      {% for module in common_kernel_modules %}
+      {{ module }}
+      {% endfor %}

@@ -1,0 +1,27 @@
+---
+- name: Create Kubernetes system group
+  ansible.builtin.group:
+    name: "{{ kubernetes_group }}"
+    state: present
+    system: true
+
+- name: Create Kubernetes system user
+  ansible.builtin.user:
+    name: "{{ kubernetes_user }}"
+    group: "{{ kubernetes_group }}"
+    groups:
+      - adm
+    append: true
+    home: "{{ kubernetes_user_home }}"
+    create_home: true
+    shell: /bin/bash
+    system: true
+    state: present
+
+- name: Create Kubernetes kubeconfig directory
+  ansible.builtin.file:
+    path: "{{ kubernetes_user_home }}/.kube"
+    state: directory
+    owner: "{{ kubernetes_user }}"
+    group: "{{ kubernetes_group }}"
+    mode: '0700'
